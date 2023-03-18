@@ -5,14 +5,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install base Dependencies
 RUN apt-get update -qq \
-        && apt-get install -y -qq python-tk tk-dev libffi-dev libssl-dev pandoc \
-        libgmp3-dev libzbar-dev tesseract-ocr xsel libpoppler-cpp-dev libmpc-dev \
-        libdbus-glib-1-dev ruby ruby-dev libenchant-2-dev apktool nodejs groff binwalk \
-        foremost tcpflow poppler-utils exiftool steghide stegsnow bison ffmpeg \
-        libgd-dev less \
-        # Clean up for smaller images
-        && apt-get clean \
-        && rm -rf /var/lib/apt/lists/*
+	&& apt-get install -y -qq python-tk tk-dev libffi-dev libssl-dev pandoc \
+	libgmp3-dev libzbar-dev tesseract-ocr xsel libpoppler-cpp-dev libmpc-dev \
+	libdbus-glib-1-dev ruby ruby-dev libenchant-2-dev apktool nodejs groff binwalk \
+	foremost tcpflow poppler-utils exiftool steghide stegsnow bison ffmpeg \
+	libgd-dev less \
+	# Clean up for smaller images
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/*
 
 RUN pip install pyyaml==5.2 cmd2==1.0.1
 
@@ -49,10 +49,9 @@ RUN pip install -r requirements.txt
 # Create runtime data directory directory
 RUN mkdir /data
 
-# Copy the start script
-RUN echo 'python -m katana "$@"' > /start.sh
-RUN chmod +x /start.sh
 
 # Run katana
-ENTRYPOINT ["/start.sh"]
-CMD ["-c", "/data/katana.ini", "-m", "monitor=/data/targets,outdir=/data/results"]
+RUN echo '#!/bin/bash\n\npython3 -m katana --manager monitor=/data/targets,outdir=/data/results,flag-format=picoCTF{.*?}' > ./setup.sh
+RUN chmod +x ./setup.sh
+
+ENTRYPOINT ["./setup.sh"]
