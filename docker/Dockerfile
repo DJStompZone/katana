@@ -7,12 +7,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -qq \
 	&& apt-get install -y -qq python-tk tk-dev libffi-dev libssl-dev pandoc \
 	libgmp3-dev libzbar-dev tesseract-ocr xsel libpoppler-cpp-dev libmpc-dev \
-	libdbus-glib-1-dev ruby libenchant-2-dev apktool nodejs groff binwalk \
+	libdbus-glib-1-dev ruby ruby-dev libenchant-2-dev apktool nodejs groff binwalk \
 	foremost tcpflow poppler-utils exiftool steghide stegsnow bison ffmpeg \
-	libgd-dev less \
+	libgd-dev less libyaml-dev libpython2.7-dev \
 	# Clean up for smaller images
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
+
+# Rdoc gem fails to build without this
+RUN pip install pyyaml==5.2
 
 # Gem complained unless you bootstrapped rdoc first. I don't know why.
 RUN gem install rdoc --no-document
@@ -42,13 +45,14 @@ RUN cp /usr/snow-20130616/snow /usr/local/bin/snow && chmod +x /usr/local/bin/sn
 RUN git clone --recursive https://github.com/JohnHammond/katana.git /katana
 # Install katana python dependencies
 WORKDIR /katana
+RUN pip install pip install cmd2==1.0.1
 RUN pip install -r requirements.txt
 
 # Create runtime data directory directory
 RUN mkdir /data
 
 # Copy the start script
-COPY katana.sh /start.sh
+RUN echo 'python -m katana "$@"' > /start.sh
 RUN chmod +x /start.sh
 
 # Run katana
