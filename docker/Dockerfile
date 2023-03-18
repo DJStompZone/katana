@@ -42,7 +42,7 @@ RUN make
 RUN cp /usr/snow-20130616/snow /usr/local/bin/snow && chmod +x /usr/local/bin/snow
 
 # Clone Katana Repository
-RUN git clone --recursive https://github.com/JohnHammond/katana.git /katana
+RUN git clone --recursive https://github.com/DJStompZone/katana.git /katana
 # Install katana python dependencies
 WORKDIR /katana
 RUN pip install pip install cmd2==1.0.1
